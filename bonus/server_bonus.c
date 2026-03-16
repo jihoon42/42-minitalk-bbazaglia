@@ -39,8 +39,8 @@ int	main(void)
 	ft_bzero(&sa, sizeof(struct sigaction));
 	sa.sa_sigaction = &handle_client_signal;
 	sa.sa_flags = SA_SIGINFO;
-	if (sigaction(SIGUSR1, &sa, NULL) == -1 \
-	|| sigaction(SIGUSR2, &sa, NULL) == -1)
+	if (sigaction(SIGUSR1, &sa, NULL) == -1
+		|| sigaction(SIGUSR2, &sa, NULL) == -1)
 		exit(ft_printf("Error setting up signal handler\n"));
 	ft_printf("Server PID: %d\n", getpid());
 	while (1)
