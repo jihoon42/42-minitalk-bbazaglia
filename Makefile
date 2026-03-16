@@ -14,50 +14,59 @@ CC = cc
 CFLAGS = -Wextra -Wall -Werror
 INCLUDE = -I ./include -I ./LIBFT/include
 LIBFT = ./LIBFT/libft.a
+LIBFT_DIR = ./LIBFT
 
 SRC_C = mandatory/client.c
 SRC_S = mandatory/server.c
 BONUS_SRC_C = bonus/client_bonus.c
 BONUS_SRC_S = bonus/server_bonus.c
 
-OBJ = obj
+OBJ_DIR = obj
 
-SRCOBJ_C = $(SRC_C:%.c=${OBJ}/%.o)
-SRCOBJ_S = $(SRC_S:%.c=${OBJ}/%.o)
-SRCOBJ_BONUS_C = $(BONUS_SRC_C:%.c=${OBJ}/%.o)
-SRCOBJ_BONUS_S = $(BONUS_SRC_S:%.c=${OBJ}/%.o)
+SRCOBJ_C = $(SRC_C:%.c=${OBJ_DIR}/%.o)
+SRCOBJ_S = $(SRC_S:%.c=${OBJ_DIR}/%.o)
+SRCOBJ_BONUS_C = $(BONUS_SRC_C:%.c=${OBJ_DIR}/%.o)
+SRCOBJ_BONUS_S = $(BONUS_SRC_S:%.c=${OBJ_DIR}/%.o)
 
-all: libft client server
+all: $(LIBFT) client server
 
-client: $(SRCOBJ_C)
-	@$(CC) $^ $(LIBFT) -o client
+# 실행 파일이 $(LIBFT)라는 '파일'에 의존하도록 설정
+client: $(SRCOBJ_C) $(LIBFT)
+	@$(CC) $(CFLAGS) $(SRCOBJ_C) $(LIBFT) -o client
+	@echo "Linking client..."
 
-server: $(SRCOBJ_S)
-	@$(CC) $^ $(LIBFT) -o server
+server: $(SRCOBJ_S) $(LIBFT)
+	@$(CC) $(CFLAGS) $(SRCOBJ_S) $(LIBFT) -o server
+	@echo "Linking server..."
 
-bonus: libft client_bonus server_bonus
+bonus: $(LIBFT) client_bonus server_bonus
 
-client_bonus: $(SRCOBJ_BONUS_C)
-	@$(CC) $^ $(LIBFT) -o client_bonus
+client_bonus: $(SRCOBJ_BONUS_C) $(LIBFT)
+	@$(CC) $(CFLAGS) $(SRCOBJ_BONUS_C) $(LIBFT) -o client_bonus
+	@echo "Linking client_bonus..."
 
-server_bonus: $(SRCOBJ_BONUS_S)
-	@$(CC) $^ $(LIBFT) -o server_bonus
+server_bonus: $(SRCOBJ_BONUS_S) $(LIBFT)
+	@$(CC) $(CFLAGS) $(SRCOBJ_BONUS_S) $(LIBFT) -o server_bonus
+	@echo "Linking server_bonus..."
 
-${OBJ}/%.o : %.c
-	@mkdir -p $(dir $@)	
-	@$(CC) $(CFLAGS) -c $< -o $@ $(INCLUDE) && printf "Compiling: $(notdir $<\n)"
+$(LIBFT):
+	@make -C $(LIBFT_DIR) all
 
-libft:
-	@make -C ./LIBFT 
+${OBJ_DIR}/%.o : %.c
+	@mkdir -p $(dir $@) 
+	@$(CC) $(CFLAGS) -c $< -o $@ $(INCLUDE)
+	@printf "Compiling: $(notdir $<)\n"
 
 clean:
-	@make -C ./LIBFT clean
-	@rm -rf $(OBJ)
+	@make -C $(LIBFT_DIR) clean
+	@rm -rf $(OBJ_DIR)
+	@echo "Cleaned object files."
 
 fclean: clean
-	@make -C ./LIBFT fclean
+	@make -C $(LIBFT_DIR) fclean
 	@rm -rf client server client_bonus server_bonus
+	@echo "Cleaned everything."
 
 re: fclean all
 
-.PHONY: all, clean, fclean, re, libft, bonus
+.PHONY: all clean fclean re bonus
